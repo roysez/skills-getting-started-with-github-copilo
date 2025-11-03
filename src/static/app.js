@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <h4>${name}</h4>
           <p>${details.description}</p>
           <p><strong>Schedule:</strong> ${details.schedule}</p>
-          <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
+          <p><strong>Availability:</strong> <span class="spots-left">${spotsLeft}</span> spots left</p>
         `;
 
         // Add participants section
@@ -40,7 +40,51 @@ document.addEventListener("DOMContentLoaded", () => {
           details.participants.forEach((p) => {
             const li = document.createElement("li");
             li.className = "participant-item";
-            li.textContent = p;
+            li.innerHTML = `
+              <span class="participant-email">${p}</span>
+              <button class="participant-remove" aria-label="Unregister ${p}">&times;</button>
+            `;
+
+            // Attach delete handler
+            const removeBtn = li.querySelector(".participant-remove");
+            removeBtn.addEventListener("click", async (ev) => {
+              ev.stopPropagation();
+              const email = p;
+              try {
+                const resp = await fetch(
+                  `/activities/${encodeURIComponent(name)}/participants?email=${encodeURIComponent(email)}`,
+                  { method: "DELETE" }
+                );
+
+                const data = await resp.json();
+                if (resp.ok) {
+                  // Remove from DOM
+                  li.remove();
+
+                  // Update spots left display
+                  const spotsSpan = activityCard.querySelector(".spots-left");
+                  if (spotsSpan) {
+                    const current = parseInt(spotsSpan.textContent, 10);
+                    spotsSpan.textContent = String(current + 1);
+                  }
+
+                  // If no participants left, show empty message
+                  if (participantsList.querySelectorAll(".participant-item").length === 0) {
+                    const empty = document.createElement("li");
+                    empty.className = "participant-empty";
+                    empty.textContent = "No participants yet";
+                    participantsList.appendChild(empty);
+                  }
+                } else {
+                  console.error("Failed to remove participant:", data);
+                  alert(data.detail || "Failed to remove participant");
+                }
+              } catch (error) {
+                console.error("Error removing participant:", error);
+                alert("Error removing participant. Check console for details.");
+              }
+            });
+
             participantsList.appendChild(li);
           });
         } else {

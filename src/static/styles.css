@@ -160,8 +160,16 @@ footer {
   list-style: disc;
 }
 
+.participants-list {
+  margin-left: 0;
+  margin-bottom: 0;
+  padding-left: 0;
+  list-style: none; /* hide bullet points */
+}
 .participant-item {
-  display: inline-block; /* pill-like appearance while keeping bullet */
+  display: inline-flex; /* pill-like appearance */
+  align-items: center;
+  gap: 8px;
   background: linear-gradient(180deg,#ffffff,#f1f7ff);
   border: 1px solid #dbe9ff;
   color: #0b3a7e;
@@ -172,6 +180,29 @@ footer {
   line-height: 1;
 }
 
+/* The participant's email text inside the pill */
+.participant-email {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+  display: inline-block;
+}
+
+/* Small remove/delete button inside the participant pill */
+.participant-remove {
+  background: transparent;
+  border: none;
+  color: #c62828;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0 6px;
+  border-radius: 6px;
+  line-height: 1;
+}
+.participant-remove:hover {
+  background: rgba(198,40,40,0.08);
+}
 /* "No participants" style */
 .participant-empty {
   display: block;
